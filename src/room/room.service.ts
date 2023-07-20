@@ -23,11 +23,10 @@ export class RoomService {
     ) { }
 
     async getRoom(link: string) {
-        //this.logger.debug(`getRoom - ${link}`);
+        this.logger.debug(`getRoom - ${link}`);
 
         const meet = await this._getMeet(link);
         const objects = await this.objectModel.find({ meet });
-
         return {
             link,
             name: meet.name,
@@ -37,19 +36,19 @@ export class RoomService {
     }
 
     async listUsersPositionByLink(link: string){
-        //this.logger.debug(`listUsersPositionByLink - ${link}`);
+        this.logger.debug(`listUsersPositionByLink - ${link}`);
 
         const meet = await this._getMeet(link);
         return await this.positionModel.find({meet});
     }
 
     async deleteUsersPosition(clientId: string){
-        //this.logger.debug(`deleteUsersPosition - ${clientId}`);
+        this.logger.debug(`deleteUsersPosition - ${clientId}`);
         return await this.positionModel.deleteMany({clientId});
     }
 
     async updateUserPosition(clientId: string, dto : UpdateUserPositionDto){
-        //this.logger.debug(`listUsersPositionByLink - ${dto.link}`);
+        this.logger.debug(`listUsersPositionByLink - ${dto.link}`);
 
         const meet = await this._getMeet(dto.link);
         const user = await this.userService.getUserById(dto.userId);
@@ -68,6 +67,7 @@ export class RoomService {
         }
 
         const usersInRoom = await this.positionModel.find({meet});
+
         const loogedUserInRoom = usersInRoom.find(u =>
             u.user.toString() === user._id.toString() || u.clientId === clientId);
         
@@ -93,65 +93,54 @@ export class RoomService {
     async lastValidPosition(userId, link:string): Promise<HistoryDocument | undefined>{ //criação da função que vai iniciar ao carregar
         const user = await this.userService.getUserById(userId.toString());
         const meet = await this._getMeet(link);
+        const validPosition = await this.historyModel.findOne({ meet: meet.id, user: user.id });
 
-        console.log(user.name, meet.link); // check para ver se os dados conferem
-
-        const validPosition = await this.historyModel.find({ userId, link: meet });
-        console.log(` ultima posição valida em validPosition do History =${validPosition}`) // check para ver se os dados conferem
         if (validPosition){
-            console.log(`1º ValidPositions ====> ${validPosition}`); // modificar aqui para retornar os parametros iniciais
-            // const dto = { // dto que contem os valores padrão
-            //     x: validPositions.x,
-            //     y: validPositions.y
-            // } as PositionDocument;
-            
-            return //dto             //só criar um dto x e y vindo do validPosition
+            const dto = { 
+                x: validPosition.x,
+                y: validPosition.y
+            } as PositionDocument;
+            return dto
         }
-        const dto = { // dto que contem os valores padrão
+
+        const dto = { 
             x:2,
             y:2
         } as PositionDocument;
         return dto;                                                                                                                                                                                                                                                                                            
     }
 
-    async findInPosition(user: string,meet:string){ // custom function criada pra obter os valores da Table Position
-        const positionSearch = await this.positionModel.find({user:user,meet:meet});
-        // console.log(user);
-        // console.log(meet);
-        console.log(typeof(positionSearch));
-        console.log(`o position search retornou ${positionSearch}`);
-        console.log(positionSearch.x)
-        const dto = {  // o erro está aqui... não consigo achar como manipular os dados dessa variavel positionSearch
-            //x:positionSearch.x, 
-            //y:positionSearch.y
+    async findInPosition(user: string,meet:string){ 
+        const positionSearch = await this.positionModel.findOne({user:user,meet:meet});
+
+        const dto = {  
+            x:positionSearch.x, 
+            y:positionSearch.y
         } as PositionDocument;
+
         return dto
     }
 
-    async saveOnLogout(userId:string,link:string){ // função para salvar ao deslogar
-        const user = await this.userService.getUserById(userId); // buscando o objeto usuario com base no ID recebido
-        const meet = await this._getMeet(link); //  buscando o objeto sala com base no link recebido
-        const meetId = meet.id; // isolando o ID da sala para inserir no db e na custom function, nao aceitava meet.id
+    async saveOnLogout(userId:string,link:string){ 
+        const user = await this.userService.getUserById(userId); 
+        const meet = await this._getMeet(link); 
+        const meetId = meet.id; 
 
-        console.log(`o objeto Usuario do ${userId} é ${user}`);  // teste
-        console.log(`o objeto Room do ${link} é ${meet}`); // teste
-        // console.log(`o ID da Room do ${link} é ${meet.id}`); // teste
-        const positionRecord = await this.findInPosition(userId, meetId); // chamando a custom function
-        console.log({positionRecord}); // teste
-        const record = { //criando o objeto que vai pra Table History
+        const positionRecord = await this.findInPosition(userId, meetId); 
+
+        const record = { 
             user: userId,
             meet: meetId,
-            x :positionRecord.x ,  // buscar da positionModel check
-            y: positionRecord.y // buscar da positionModel check
+            x :positionRecord.x ,  
+            y: positionRecord.y 
         }
-        console.log(`o registro a salvar é ${record}`); // teste 
-        const savedOnHistory = await this.historyModel.findOne(user.id, meet.id); // Objt da table - Find Many
-        console.log(savedOnHistory); // teste 
+        
+        const savedOnHistory = await this.historyModel.findOne({user:user.id, meet: meet.id});
 
         if(!savedOnHistory){
-            await this.historyModel.create(record) //se não, Salva
+            await this.historyModel.create(record) 
         }else{
-            await this.historyModel.findByIdAndUpdate(savedOnHistory.id, record) // se sim, atualiza
+            await this.historyModel.findByIdAndUpdate(savedOnHistory.id, record) 
         }
     }
 
