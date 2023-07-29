@@ -36,7 +36,7 @@ export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
       socket => socket.id !== client.id
     );
     const userId = existingOnSocket.userId; 
-    const meet = existingOnSocket.room; 
+    const meet = existingOnSocket.room;
 
     await this.service.saveOnLogout(userId, meet);
     await this.service.deleteUsersPosition(client.id);
@@ -88,7 +88,7 @@ export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
       y = dto.y;
 
       await this.service.updateUserPosition(client.id, dto);
-      
+
     }
 
     const users = await this.service.listUsersPositionByLink(link);
@@ -102,19 +102,22 @@ export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('move')
-  async handleMove(client: Socket, payload: UpdateUserPositionDto) {
+  async handleMove(client: Socket, payload: UpdateUserPositionDto){   
     const { link, userId, x, y, orientation } = payload;
-    const dto = {
+    const dto = { 
       link,
       userId,
       x,
       y,
       orientation
     } as UpdateUserPositionDto
-
-    await this.service.updateUserPosition(client.id, dto);
-    const users = await this.service.listUsersPositionByLink(link);
-    this.wss.emit(`${link}-update-user-list`, { users });
+    
+    const auth = await this.service.canGo(dto); // desafio do Kaique de não deixar colidir com outros usuarios
+    if (auth == true){ // validador do desafio do Kaique
+      await this.service.updateUserPosition(client.id, dto);
+      const users = await this.service.listUsersPositionByLink(link);
+      this.wss.emit(`${link}-update-user-list`, { users });
+    }
   }
 
   @SubscribeMessage('toggl-mute-user')
