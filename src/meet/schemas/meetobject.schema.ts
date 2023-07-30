@@ -20,6 +20,12 @@ export class MeetObject{
     y: number;
 
     @Prop({required:true})
+    height: number;
+
+    @Prop({required:true})
+    width: number;
+
+    @Prop({required:true})
     zIndex: number;
 
     @Prop()

@@ -38,7 +38,7 @@ export class RoomService {
     }
 
     async listUsersPositionByLink(link: string){
-        this.logger.debug(`listUsersPositionByLink - ${link}`);
+        //this.logger.debug(`listUsersPositionByLink - ${link}`);
 
         const meet = await this._getMeet(link);
         return await this.positionModel.find({meet});
@@ -116,7 +116,7 @@ export class RoomService {
         const {link, userId} = dto; // parametros da sala, do user e do positions
         const meet = await this._getMeet(link); // pegar os dados da sala para obter o meetId
         let allObjects = []; // array para armazenar todos os objetos e users da sala
-        let users;
+        let users, objects, objMatrix;
         const destination = { // dados do destino do usuario que vieram pelo Dto
             x:dto.x,
             y:dto.y
@@ -124,7 +124,6 @@ export class RoomService {
         let meetObjects = [];
         meetObjects = await this.meetService.getMeetObjects(meet.id, userId);//puxando os dados dos objects do db
         //console.log(meetObjects) // verificando enquanto ando
-        let objects;
         for (const object of meetObjects) { // modelando objetos para não haver atributos desnecessários
             objects = {
                 x : object.x,
@@ -134,9 +133,26 @@ export class RoomService {
                 canPass : object.zIndex > 3 ? false : true
             }
             allObjects.push(objects); //adicionar objetos 1 a 1 no array
+            if (object.height > 1 || object.width > 1){
+                for (let startX = objects.x; startX < (objects.x + object.height); startX++){
+                    for (let startY = objects.y; startY < (objects.y + object.width); startY++){
+                        objMatrix = {
+                            x:startX,
+                            y:startY,
+                            user: null,
+                            object : `extends of ${object._id.toString()}`,
+                            canPass: objects.canPass
+                        }
+                        if(objects.x !==startX || objects.y !==startY){
+                            allObjects.push(objMatrix);
+                        }
+                    }
+                }                
+            }
+            
         }
         const allUser = await this.listUsersPositionByLink(link);// pegando usuarios 1 a 1 da table positions
-        for (const user of allUser) { //modelando objetos para não haver atributos desnecessários
+        for (const user of allUser) { //modelando users para não haver atributos desnecessários e caber no mesmo array
             users = {
                 x : user.x,
                 y : user.y,
@@ -146,10 +162,13 @@ export class RoomService {
             }
             allObjects.push(users);
         }
+        
         this.logger.debug(`Can I Go There?`); //logger só para localização
         let target = await allObjects.find(targetcell => //dando find na posição destino
             targetcell.x == destination.x && targetcell.y == destination.y)
-        console.log(target?.canPass)
+        console.log({destination});
+        console.log(target);
+        console.log(target?.canPass);
         // setando params do if para saber se posso me locomover
         if (!target || (typeof(target)) === undefined || target.canPass !== false ){
             this.logger.debug(`Yes You Can!`);

@@ -24,6 +24,16 @@ export class UpdateMeetObjectDto {
     @Max(8,{message: MeetMessagesHelper.UPDATE_XY_NOT_VALID})
     y:number;
 
+    @IsNumber({},{message: "Tem que sem um numero"})
+    @Min(1,{message: "maior que 0"})
+    @Max(3,{message: "menor que 4"})
+    height: number;
+
+    @IsNumber({},{message: "Tem que sem um numero"})
+    @Min(1,{message: "maior que 0"})
+    @Max(3,{message: "menor que 4"})
+    width: number;
+
     @IsNumber({},{message: MeetMessagesHelper.UPDATE_ZINDEX_NOT_VALID})
     zIndex:number;
 
