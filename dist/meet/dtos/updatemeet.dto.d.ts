@@ -6,8 +6,8 @@ export declare class UpdateMeetObjectDto {
     name: string;
     x: number;
     y: number;
-    height: number;
-    width: number;
+    height?: number;
+    width?: number;
     zIndex: number;
     orientation: string;
 }

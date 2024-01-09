@@ -42,13 +42,15 @@ __decorate([
     __metadata("design:type", Number)
 ], UpdateMeetObjectDto.prototype, "y", void 0);
 __decorate([
-    (0, class_validator_1.IsNumber)({}, { message: "Tem que sem um numero" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)({}, { message: "Tem que ser um numero" }),
     (0, class_validator_1.Min)(1, { message: "maior que 0" }),
     (0, class_validator_1.Max)(3, { message: "menor que 4" }),
     __metadata("design:type", Number)
 ], UpdateMeetObjectDto.prototype, "height", void 0);
 __decorate([
-    (0, class_validator_1.IsNumber)({}, { message: "Tem que sem um numero" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)({}, { message: "Tem que ser um numero" }),
     (0, class_validator_1.Min)(1, { message: "maior que 0" }),
     (0, class_validator_1.Max)(3, { message: "menor que 4" }),
     __metadata("design:type", Number)

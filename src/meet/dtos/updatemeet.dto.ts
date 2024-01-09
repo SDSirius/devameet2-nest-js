@@ -1,7 +1,8 @@
 import { Type } from "class-transformer";
-import { IsArray, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, MinLength, ValidateNested } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from "class-validator";
 import { MeetMessagesHelper } from "../helpers/meetmessages.helper";
 import { CreateMeetDto } from "./createmeet.dto";
+
 
 export class UpdateMeetDto extends CreateMeetDto {
     @IsArray({message: MeetMessagesHelper.UPDATE_OBJECT_NAME_NOT_VALID})
@@ -24,15 +25,17 @@ export class UpdateMeetObjectDto {
     @Max(8,{message: MeetMessagesHelper.UPDATE_XY_NOT_VALID})
     y:number;
 
-    @IsNumber({},{message: "Tem que sem um numero"})
+    @IsOptional()
+    @IsNumber({},{message: "Tem que ser um numero"})
     @Min(1,{message: "maior que 0"})
     @Max(3,{message: "menor que 4"})
-    height: number;
+    height?: number;
 
-    @IsNumber({},{message: "Tem que sem um numero"})
+    @IsOptional()
+    @IsNumber({},{message: "Tem que ser um numero"})
     @Min(1,{message: "maior que 0"})
     @Max(3,{message: "menor que 4"})
-    width: number;
+    width?: number;
 
     @IsNumber({},{message: MeetMessagesHelper.UPDATE_ZINDEX_NOT_VALID})
     zIndex:number;

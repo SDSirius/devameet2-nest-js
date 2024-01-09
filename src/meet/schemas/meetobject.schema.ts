@@ -19,11 +19,11 @@ export class MeetObject{
     @Prop({required:true})
     y: number;
 
-    @Prop({required:true})
-    height: number;
+    @Prop()
+    height?: number;
 
-    @Prop({required:true})
-    width: number;
+    @Prop()
+    width?: number;
 
     @Prop({required:true})
     zIndex: number;

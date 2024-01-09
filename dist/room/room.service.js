@@ -119,9 +119,9 @@ let RoomService = RoomService_1 = class RoomService {
                 canPass: object.zIndex > 3 ? false : true
             };
             allObjects.push(objects);
-            if (object.height > 1 || object.width > 1) {
-                for (let startX = objects.x; startX < (objects.x + object.height); startX++) {
-                    for (let startY = objects.y; startY < (objects.y + object.width); startY++) {
+            if ((object === null || object === void 0 ? void 0 : object.height) > 1 || (object === null || object === void 0 ? void 0 : object.width) > 1) {
+                for (let startX = objects.x; startX < (objects.x + (object === null || object === void 0 ? void 0 : object.height)); startX++) {
+                    for (let startY = objects.y; startY < (objects.y + (object === null || object === void 0 ? void 0 : object.width)); startY++) {
                         objMatrix = {
                             x: startX,
                             y: startY,

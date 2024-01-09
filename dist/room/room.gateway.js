@@ -57,7 +57,7 @@ let RoomGateway = RoomGateway_1 = class RoomGateway {
                 userId,
                 x: x,
                 y: y,
-                orientation: 'down'
+                orientation: 'front'
             };
             loggedUsers.map(UserPosit => {
                 if (UserPosit.x === dto.x && UserPosit.y === dto.y) {

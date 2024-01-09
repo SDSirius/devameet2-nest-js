@@ -75,7 +75,7 @@ export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
         userId,
         x: x,
         y: y,
-        orientation: 'down'
+        orientation: 'front'
       } as UpdateUserPositionDto
       
       loggedUsers.map(UserPosit =>{

@@ -133,9 +133,9 @@ export class RoomService {
                 canPass : object.zIndex > 3 ? false : true
             }
             allObjects.push(objects); //adicionar objetos 1 a 1 no array
-            if (object.height > 1 || object.width > 1){
-                for (let startX = objects.x; startX < (objects.x + object.height); startX++){
-                    for (let startY = objects.y; startY < (objects.y + object.width); startY++){
+            if (object?.height > 1 || object?.width > 1){
+                for (let startX = objects.x; startX < (objects.x + object?.height); startX++){
+                    for (let startY = objects.y; startY < (objects.y + object?.width); startY++){
                         objMatrix = {
                             x:startX,
                             y:startY,

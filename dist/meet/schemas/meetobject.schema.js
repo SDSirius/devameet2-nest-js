@@ -32,11 +32,11 @@ __decorate([
     __metadata("design:type", Number)
 ], MeetObject.prototype, "y", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeetObject.prototype, "height", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeetObject.prototype, "width", void 0);
 __decorate([
