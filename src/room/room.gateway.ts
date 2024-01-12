@@ -13,7 +13,7 @@ type ActiveSocketType = {
   userId: string;
 }
 
-@WebSocketGateway({cors: true})
+@WebSocketGateway({cors: false})
 export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   constructor(
