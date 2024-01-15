@@ -13,7 +13,7 @@ type ActiveSocketType = {
   userId: string;
 }
 
-@WebSocketGateway({cors: false})
+@WebSocketGateway({cors: true})
 export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   constructor(
@@ -102,9 +102,9 @@ export class RoomGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('move')
-  async handleMove(client: Socket, payload: UpdateUserPositionDto){   
+  async handleMove(client: Socket, payload: UpdateUserPositionDto) {
     const { link, userId, x, y, orientation } = payload;
-    const dto = { 
+    const dto = {
       link,
       userId,
       x,

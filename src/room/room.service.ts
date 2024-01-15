@@ -113,71 +113,41 @@ export class RoomService {
     }
     // função pra validação da colisão
     async canGo(dto){
-        const {link, userId} = dto; // parametros da sala, do user e do positions
-        const meet = await this._getMeet(link); // pegar os dados da sala para obter o meetId
-        let allObjects = []; // array para armazenar todos os objetos e users da sala
-        let users, objects, objMatrix;
-        const destination = { // dados do destino do usuario que vieram pelo Dto
-            x:dto.x,
-            y:dto.y
-        }
-        let meetObjects = [];
-        meetObjects = await this.meetService.getMeetObjects(meet.id, userId);//puxando os dados dos objects do db
-        //console.log(meetObjects) // verificando enquanto ando
-        for (const object of meetObjects) { // modelando objetos para não haver atributos desnecessários
-            objects = {
-                x : object.x,
-                y : object.y,
-                user: null,
-                object : object._id.toString(),
-                canPass : object.zIndex > 3 ? false : true
+        const {link, userId, x, y, orientation} = dto; // parametros da sala, do user e do positions
+        const meet = await this._getMeet(link); 
+        const meetObjects = await this.meetService.getMeetObjects(meet.id, userId);
+        const allUser = await this.listUsersPositionByLink(link);
+        const allObjects = [];
+
+        meetObjects.forEach(object => {
+            const { x, y, zIndex } = object;
+            allObjects.push({ x, y, zIndex, type: 'object' });
+        });
+
+        allUser.forEach(user => {
+            if (userId.toString() !== user.user.toString()){
+                const { x, y } = user;
+                allObjects.push({ x, y, zIndex: 0, type: 'user' }); // Usuários têm zIndex 0
             }
-            allObjects.push(objects); //adicionar objetos 1 a 1 no array
-            if (object?.height > 1 || object?.width > 1){
-                for (let startX = objects.x; startX < (objects.x + object?.height); startX++){
-                    for (let startY = objects.y; startY < (objects.y + object?.width); startY++){
-                        objMatrix = {
-                            x:startX,
-                            y:startY,
-                            user: null,
-                            object : `extends of ${object._id.toString()}`,
-                            canPass: objects.canPass
-                        }
-                        if(objects.x !==startX || objects.y !==startY){
-                            allObjects.push(objMatrix);
-                        }
-                    }
-                }                
-            }
-            
-        }
-        const allUser = await this.listUsersPositionByLink(link);// pegando usuarios 1 a 1 da table positions
-        for (const user of allUser) { //modelando users para não haver atributos desnecessários e caber no mesmo array
-            users = {
-                x : user.x,
-                y : user.y,
-                user : user._id.toString(),
-                object: null,
-                canPass : false
-            }
-            allObjects.push(users);
-        }
+        });
         
-        this.logger.debug(`Can I Go There?`); //logger só para localização
-        let target = await allObjects.find(targetcell => //dando find na posição destino
-            targetcell.x == destination.x && targetcell.y == destination.y)
-        console.log({destination});
-        console.log(target);
-        console.log(target?.canPass);
-        // setando params do if para saber se posso me locomover
-        if (!target || (typeof(target)) === undefined || target.canPass !== false ){
-            this.logger.debug(`Yes You Can!`);
-            return true;
-        }else{
-            this.logger.debug(`No You Can't`);
-            return false;                
-        }
-    }
+        const destination = { x, y, zIndex: dto.zIndex ?? 0 };
+
+        const isCollision = allObjects.some(obj => {
+          if (obj.x === destination.x && obj.y === destination.y) {
+            if (obj.type === 'object' && destination.zIndex >= 3) {
+              // Usuário não pode passar por objetos com zIndex maior ou igual a 3
+              return true;
+            }
+            if (obj.type === 'user') {
+              return true;
+            }
+          }
+          return false;
+        });
+        return !isCollision;
+      }
+      
     // fim do desafio do Kaique
 
     async findInPosition(user: string,meet:string){ 
